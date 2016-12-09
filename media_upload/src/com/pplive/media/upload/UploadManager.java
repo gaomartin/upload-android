@@ -42,7 +42,7 @@ public class UploadManager {
 	private List<UploadThread> threads = new ArrayList<UploadThread>();
 	public static final String version = "1.0.20160902.0";
 	private int fileStatus;
-	
+
 	public String getSize() {
 		return size;
 	}
@@ -94,8 +94,7 @@ public class UploadManager {
 		}
 		String logPath = f.getAbsolutePath();// /storage/emulated/0/Android/data/com.pplive.videoplayer.test/cache
 		ApplogManager.getInstance().init(mContext, logPath);
-		LogUtils.error("media_upload_sdk init success. version=" + version
-				+ ", logPath=" + logPath);
+		LogUtils.error("media_upload_sdk init success. version=" + version + ", logPath=" + logPath);
 	}
 
 	public static UploadManager getInstance() {
@@ -114,7 +113,6 @@ public class UploadManager {
 		info.setState(UploadInfo.STATE_WAIT);
 		info.setUserName(Constants.PPYUN_USERNAME);
 		info.setName(name);
-		info.setCategoryId(Constants.CATEGORY_ID);
 		getFid(info);
 	}
 
@@ -143,72 +141,51 @@ public class UploadManager {
 
 			@Override
 			public void onResponse(String arg0, int arg1) {
-				FidRespBean fidRespBean = GsonUtil.fromJson(arg0,
-						FidRespBean.class);
+				LogUtils.error("arg0 =" + arg0.toString());
+				FidRespBean fidRespBean = GsonUtil.fromJson(arg0, FidRespBean.class);
 				if (fidRespBean != null) {
-					LogUtils.error("getFid fid = "
-							+ fidRespBean.getData().getFId()
-							+ "  file_status = "
-							+ fidRespBean.getData().getFile_status());
 					fileStatus = fidRespBean.getData().getFile_status();
-					UploadHelper.getInstance().setFid(
-							fidRespBean.getData().getFId() + "");
-					getToken(info);// 获取token
-				} else {
-					listener.onAddUploadTask(false);
-				}
-			}
-		}, info);
-	}
+					int fid = fidRespBean.getData().getFid();
+					UploadHelper.getInstance().setFid(fid + "");
 
-	public void getToken(final UploadInfo info) {
-		UploadAPI.getInstance().getToken(new StringCallback() {
-			@Override
-			public void onError(Call arg0, Exception arg1, int arg2) {
-				LogUtils.error("getToken e =" + arg1.toString());
-				listener.onAddUploadTask(false);
-			}
+					String token = fidRespBean.getData().getUp_token();
+					if (!token.isEmpty()) {
+						UploadHelper.getInstance().setToken(token);
+						listener.onAddUploadTask(true);
+						info.setToken(token);
+						info.setFid(fid + "");
+						info.setChannel_web_id(fidRespBean.getData().getChannel_web_id());
+//						info.setLength(fidRespBean.getData().getLength());
+						info.setCategoryId(fidRespBean.getData().getCategory_id());
+							
+						LogUtils.error("insertUpload info = " + info.toString());
+						mUploadManager.insertUpload(info);
 
-			@Override
-			public void onResponse(String arg0, int arg1) {
-				LogUtils.error("getToken response =" + arg0.toString());
-				RespBean respBean = GsonUtil.fromJson(arg0, RespBean.class);
-				if (respBean != null && "success".equals(respBean.getMsg())) {
-					LogUtils.error("token = " + respBean.getData());
-					UploadHelper.getInstance().setToken(respBean.getData());
-					listener.onAddUploadTask(true);
-					info.setToken(respBean.getData());
-					info.setFid(UploadHelper.getInstance().getFid());
-					LogUtils.error("insertUpload info = " + info.toString());
-					mUploadManager.insertUpload(info);
-
-					
-					if (fileStatus < 100) {
-						// 提交MD5
-						UploadAPI.getInstance().sendMd5(new StringCallback() {
-							@Override
-							public void onResponse(String arg0, int arg1) {
-								LogUtils.error("sendMd5 response ="
-										+ arg0.toString());
-								RespBean respBean = GsonUtil.fromJson(arg0,
-										RespBean.class);
-								if (respBean != null) {
-									if (respBean.getErr() == 0) {
-										LogUtils.error("MD5提交成功 fid:"
-												+ info.getFid());
-									} else {
-										LogUtils.error("MD5提交失败");
+						if (fileStatus < 100) {
+							// 提交MD5
+							UploadAPI.getInstance().sendMd5(new StringCallback() {
+								@Override
+								public void onResponse(String arg0, int arg1) {
+									LogUtils.error("sendMd5 response =" + arg0.toString());
+									RespBean respBean = GsonUtil.fromJson(arg0, RespBean.class);
+									if (respBean != null) {
+										if (respBean.getErr() == 0) {
+											LogUtils.error("MD5提交成功 fid:" + info.getFid());
+										} else {
+											LogUtils.error("MD5提交失败");
+										}
 									}
 								}
-							}
 
-							@Override
-							public void onError(Call arg0, Exception arg1,
-									int arg2) {
-								LogUtils.error("sendMd5 e =" + arg1.toString());
-								LogUtils.error("MD5提交失败");
-							}
-						}, info);
+								@Override
+								public void onError(Call arg0, Exception arg1, int arg2) {
+									LogUtils.error("sendMd5 e =" + arg1.toString());
+									LogUtils.error("MD5提交失败");
+								}
+							}, info);
+						}
+					} else {
+						listener.onAddUploadTask(false);
 					}
 				} else {
 					listener.onAddUploadTask(false);
@@ -226,8 +203,7 @@ public class UploadManager {
 	}
 
 	public void uploadFile(final UploadInfo info) {
-		LogUtils.error("===uploadFile(info)=== fid =" + info.getFid()
-				+ " state =" + info.getState());
+		LogUtils.error("===uploadFile(info)=== fid =" + info.getFid() + " state =" + info.getState());
 		for (UploadThread ut : threads) {
 			if (ut.getInfo().getId() == info.getId()) {
 				if (ut.getInfo().isPause()) {
@@ -244,13 +220,10 @@ public class UploadManager {
 
 			@Override
 			public void onResponse(String arg0, int arg1) {
-				LogUtils.error("getUploadRange fid:" + info.getFid()
-						+ "response =" + arg0.toString());
-				UploadRangeBean uploadRangeBean = GsonUtil.fromJson(arg0,
-						UploadRangeBean.class);
+				LogUtils.error("getUploadRange fid:" + info.getFid() + "response =" + arg0.toString());
+				UploadRangeBean uploadRangeBean = GsonUtil.fromJson(arg0, UploadRangeBean.class);
 				if (uploadRangeBean != null) {
-					final List<RangesBean> ranges = uploadRangeBean.getData()
-							.getRanges();
+					final List<RangesBean> ranges = uploadRangeBean.getData().getRanges();
 					final int status = uploadRangeBean.getData().getStatus();
 					if (status >= 100) {
 						info.setState(UploadInfo.STATE_UPLOAD_SUCCESS);
@@ -284,8 +257,7 @@ public class UploadManager {
 	}
 
 	public String getRangeMd5(UploadInfo info, long start, long end) {
-		return FileMD5.getFileRangeMD5String(new File(info.getLocalPath()),
-				start, end);
+		return FileMD5.getFileRangeMD5String(new File(info.getLocalPath()), start, end);
 	}
 
 	private void start(List<RangesBean> mRanges, UploadInfo info) {
@@ -325,8 +297,7 @@ public class UploadManager {
 				public void run() {
 					try {
 						if (info.getState() == UploadInfo.STATE_UPLOADING) {
-							int code = UploadAPI.getInstance().uploadFile(
-									mRanges, info);
+							int code = UploadAPI.getInstance().uploadFile(mRanges, info);
 							LogUtils.error("uploadfile resp code = " + code);
 							if (code == 3) {
 								info.setState(UploadInfo.STATE_UPLOAD_FALI);

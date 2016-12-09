@@ -6,6 +6,6 @@ media_upload/bin/jarlist.cache
 media_upload/bin/media_upload.jar
 media_upload/bin
 media_upload_test/bin
-.classpath
-.project
-*/.settings/*
+media_upload_test/gen
+media_upload_demo/bin
+media_upload_demo/gen

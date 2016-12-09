@@ -22,7 +22,7 @@ public class UploadInfo {
 	private String fid;
 	private long pid;
 	private String userName;
-	private String categoryId;
+	private int categoryId;
 	private int state;
 	private String size;
 	private String name;
@@ -32,6 +32,32 @@ public class UploadInfo {
 	private String token;
 	private String apitk;
 	private boolean isPause;
+	private String channel_web_id;
+	private int length;
+
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public int getLength() {
+		return length;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
+	}
+
+	public String getChannel_web_id() {
+		return channel_web_id;
+	}
+
+	public void setChannel_web_id(String channel_web_id) {
+		this.channel_web_id = channel_web_id;
+	}
 
 	public boolean isPause() {
 		return isPause;
@@ -121,14 +147,6 @@ public class UploadInfo {
 		this.userName = userName;
 	}
 
-	public String getCategoryId() {
-		return categoryId;
-	}
-
-	public void setCategoryId(String categoryId) {
-		this.categoryId = categoryId;
-	}
-
 	public int getState() {
 		return state;
 	}
@@ -163,11 +181,9 @@ public class UploadInfo {
 
 	@Override
 	public String toString() {
-		return "UploadInfo [finishSize=" + finishSize + ", status=" + status
-				+ ", ppfeature=" + ppfeature + ", fid=" + fid + ", pid=" + pid
-				+ ", userName=" + userName + ", categoryId=" + categoryId
-				+ ", state=" + state + ", size=" + size + ", name=" + name
-				+ ", localPath=" + localPath + ", id=" + id + ", progress="
+		return "UploadInfo [finishSize=" + finishSize + ", status=" + status + ", ppfeature=" + ppfeature + ", fid="
+				+ fid + ", pid=" + pid + ", userName=" + userName + ", categoryId=" + categoryId + ", state=" + state
+				+ ", size=" + size + ", name=" + name + ", localPath=" + localPath + ", id=" + id + ", progress="
 				+ progress + ", token=" + token + ", apitk=" + apitk + "]";
 	}
 

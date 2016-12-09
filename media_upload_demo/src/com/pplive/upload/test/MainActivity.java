@@ -186,7 +186,7 @@ public class MainActivity extends Activity implements UpLoadManagerListener {
 
 	@Override
 	public void onUploadSuccess(UploadInfo info) {
-		LogUtils.error("== onUploadSuccess() == info.webid = " + info.getChannel_web_id());
+		LogUtils.error("== onUploadSuccess() ==");
 		if (info.getState() == UploadInfo.STATE_HAS_UPLOAD) {
 			Toast.makeText(mContext, "已上传过", 0).show();
 			return;

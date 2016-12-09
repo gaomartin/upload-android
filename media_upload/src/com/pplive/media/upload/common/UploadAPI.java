@@ -62,8 +62,7 @@ public class UploadAPI {
 			@Override
 			public void onResponse(String arg0, int arg1) {
 				LogUtils.error("getUploadProgress response =" + arg0.toString());
-				UploadingProgressResp resp = GsonUtil.fromJson(arg0,
-						UploadingProgressResp.class);
+				UploadingProgressResp resp = GsonUtil.fromJson(arg0, UploadingProgressResp.class);
 				int finish = resp.getData().getFinished();
 				info.setProgress(finish);
 				UploadManager.getInstance().notifyUploadInfo(info);
@@ -78,45 +77,21 @@ public class UploadAPI {
 
 	// 获取FID
 	public void getFid(StringCallback callback, UploadInfo info) {
-		String apitk = UploadHelper.getInstance().getApitk(Constants.PPYUN_KEY,
-				Constants.PPCLOUD_TEST_URL);
-		OkHttpUtils.post().url(Constants.PPCLOUD_TEST_URL)
-				.addParams("name", info.getName())
-				.addParams("length", info.getSize())
-				.addParams(PPFEATURE, info.getPpfeature())
-				.addParams("username", Constants.PPYUN_USERNAME)
-				.addParams(APITK, apitk)
-				.addParams(CATEGORYID, Constants.CATEGORY_ID).build()
+		OkHttpUtils.get().url("http://115.231.44.26:8081/uploadtest/uptoken").addParams("name", info.getName())
+				.addParams("length", info.getSize()).addParams(PPFEATURE, info.getPpfeature()).build()
 				.execute(callback);
-		LogUtils.error("getFid : apkit = " + apitk + " ,ppfeature = "
-				+ info.getPpfeature() + " ,size = " + info.getSize());
-	}
-
-	// 获取token
-	public void getToken(StringCallback callback, UploadInfo info) {
-		String apitk = UploadHelper.getInstance().getApitk(Constants.PPYUN_KEY,
-				Constants.PPCLOUD_TEST_TOKEN_URL);
-		OkHttpUtils.get().url(Constants.PPCLOUD_TEST_TOKEN_URL)
-				.addParams(PPFEATURE, info.getPpfeature())
-				.addParams("username", Constants.PPYUN_USERNAME)
-				.addParams(APITK, apitk).build().execute(callback);
 	}
 
 	// 上传范围
 	public void getUploadRange(StringCallback callback, UploadInfo info) {
-		OkHttpUtils
-				.get()
-				.url(Constants.PPCLOUD_PUBLIC_TEST_UPLOADRANGE_URL
-						+ info.getFid() + Constants.UPLOADRANGE_END)
-				.addHeader(AUTHORIZATION, info.getToken())
-				.addParams(FEATURE_PPLIVE, info.getPpfeature())
-				.addParams(SEGS, "1").addParams("fromcp", "ppcloud")
-				.addParams(INNER, "false").build().execute(callback);
+		OkHttpUtils.get().url(Constants.PPCLOUD_PUBLIC_UPLOADRANGE_URL + info.getFid() + Constants.UPLOADRANGE_END)
+				.addHeader(AUTHORIZATION, info.getToken()).addParams(FEATURE_PPLIVE, info.getPpfeature())
+				.addParams(SEGS, "1").addParams("fromcp", "ppcloud").addParams(INNER, "false").build()
+				.execute(callback);
 	}
 
 	// 上传分段文件
-	public int uploadFile(List<RangesBean> ranges, final UploadInfo info)
-			throws IOException {
+	public int uploadFile(List<RangesBean> ranges, final UploadInfo info) throws IOException {
 		LogUtils.error("上传分段文件 : ==uploadFile(ranges)== fid:" + info.getFid());
 		File file = new File(info.getLocalPath());
 		BasicHttpParams httpParameters = new BasicHttpParams();
@@ -129,35 +104,30 @@ public class UploadAPI {
 		if (ranges != null) {
 			for (int i = 0; i < ranges.size(); i++) {
 				final int range = i;
-				String segMd5 = UploadManager.getInstance().getRangeMd5(info,
-						ranges.get(i).getStart(), ranges.get(i).getEnd());
+				String segMd5 = UploadManager.getInstance().getRangeMd5(info, ranges.get(i).getStart(),
+						ranges.get(i).getEnd());
 				long start = ranges.get(i).getStart();
 				long end = ranges.get(i).getEnd();
 				String uploadUrl = ranges.get(i).getUpload_url();
-				byte[] rangeMd5Bytes = FileMD5.getFileRangeMD5Bytes(file,
-						start, end);
+				byte[] rangeMd5Bytes = FileMD5.getFileRangeMD5Bytes(file, start, end);
 				String rangeMd5 = FileMD5.bufferToHex(rangeMd5Bytes);
 				HttpPut putAzureRequest = new HttpPut(uploadUrl);
 				putAzureRequest.addHeader(AUTHORIZATION, info.getToken());
 				putAzureRequest.addHeader(ETAG, segMd5);
-				putAzureRequest.addHeader("Content-MD5",
-						Base64.encode(rangeMd5Bytes));
+				putAzureRequest.addHeader("Content-MD5", Base64.encode(rangeMd5Bytes));
 				FileInputStream sourceStream = null;
 				try {
 					sourceStream = new FileInputStream(file);
 					sourceStream.skip(start);
-					InputStreamEntity entity = new InputStreamEntity(
-							sourceStream, end - start + 1);
+					InputStreamEntity entity = new InputStreamEntity(sourceStream, end - start + 1);
 					putAzureRequest.setEntity(entity);
 					HttpResponse response = httpClient.execute(putAzureRequest);
 					StatusLine statusLine = response.getStatusLine();
 					code = statusLine.getStatusCode();
-					LogUtils.error("fid:" + info.getFid() + "code = " + code
-							+ " ,range = " + ranges.get(i).getStart() + " , "
-							+ ranges.get(i).getEnd());
+					LogUtils.error("fid:" + info.getFid() + "code = " + code + " ,range = " + ranges.get(i).getStart()
+							+ " , " + ranges.get(i).getEnd());
 					if (code == 201) {
-						LogUtils.error("上传成功 fid:" + info.getFid() + " range "
-								+ range);
+						LogUtils.error("上传成功 fid:" + info.getFid() + " range " + range);
 						// if (range == ranges.size() - 1) {
 						// int finishSize = ranges.get(i).getEnd()
 						// - ranges.get(i).getStart();
@@ -171,42 +141,32 @@ public class UploadAPI {
 						Header header = response.getFirstHeader(ETAG);
 						uploadId = header.getValue();
 						// 上传汇报
-						uploadReport(rangeMd5, ranges.get(i).getBid(),
-								uploadId, new StringCallback() {
+						uploadReport(rangeMd5, ranges.get(i).getBid(), uploadId, new StringCallback() {
 
-									@Override
-									public void onResponse(String arg0, int arg1) {
-										LogUtils.error("uploadReport fid:"
-												+ info.getFid() + "response ="
-												+ arg0.toString());
-										RespBean respBean = GsonUtil.fromJson(
-												arg0, RespBean.class);
-										if (respBean != null) {
-											if (respBean.getErr() == 0) {
-												LogUtils.error("汇报成功：fid:"
-														+ info.getFid()
-														+ " range " + range);
-											}
-										}
+							@Override
+							public void onResponse(String arg0, int arg1) {
+								LogUtils.error("uploadReport fid:" + info.getFid() + "response =" + arg0.toString());
+								RespBean respBean = GsonUtil.fromJson(arg0, RespBean.class);
+								if (respBean != null) {
+									if (respBean.getErr() == 0) {
+										LogUtils.error("汇报成功：fid:" + info.getFid() + " range " + range);
 									}
+								}
+							}
 
-									@Override
-									public void onError(Call arg0,
-											Exception arg1, int arg2) {
-										LogUtils.error("uploadReport e ="
-												+ arg1.toString());
-										LogUtils.error("汇报失败：" + " range "
-												+ range);
-									}
-								}, info);
+							@Override
+							public void onError(Call arg0, Exception arg1, int arg2) {
+								LogUtils.error("uploadReport e =" + arg1.toString());
+								LogUtils.error("汇报失败：" + " range " + range);
+							}
+						}, info);
 						code = 4;
 					} else {
 						LogUtils.error("上传失败" + " range " + range);
 						code = 3;
 					}
 				} catch (Exception e) {
-					LogUtils.error("uploadFile fid:" + info.getFid() + " e = "
-							+ e.toString());
+					LogUtils.error("uploadFile fid:" + info.getFid() + " e = " + e.toString());
 					code = 3;
 				} finally {
 					if (sourceStream != null) {
@@ -222,14 +182,10 @@ public class UploadAPI {
 	}
 
 	// 上传汇报
-	private void uploadReport(String rangeMD5, String bid, String uploadid,
-			StringCallback callback, UploadInfo info) {
-		OkHttpUtils
-				.post()
-				.url(Constants.PPCLOUD_PUBLIC_TEST_UPLOADRANGE_REPORT_URL
-						+ info.getFid() + Constants.UPLOADRANGE_REPORT_END)
-				.addHeader(AUTHORIZATION, info.getToken())
-				.addParams(RANGE_MD5, rangeMD5).addParams("bid", bid)
+	private void uploadReport(String rangeMD5, String bid, String uploadid, StringCallback callback, UploadInfo info) {
+		OkHttpUtils.post()
+				.url(Constants.PPCLOUD_PUBLIC_UPLOADRANGE_REPORT_URL + info.getFid() + Constants.UPLOADRANGE_REPORT_END)
+				.addHeader(AUTHORIZATION, info.getToken()).addParams(RANGE_MD5, rangeMD5).addParams("bid", bid)
 				.addParams(UPLOADID, uploadid).build().execute(callback);
 	}
 
@@ -244,22 +200,15 @@ public class UploadAPI {
 			return;
 		}
 		LogUtils.error("fileMd5 =" + fileMd5);
-		OkHttpUtils
-				.post()
-				.url(Constants.PPCLOUD_PUBLIC_TEST_REPORT_MD5_URL
-						+ info.getFid() + Constants.REPORT_MD5_END)
-				.addHeader(AUTHORIZATION, info.getToken())
-				.addParams(FEATURE_PPLIVE, info.getPpfeature())
+		OkHttpUtils.post().url(Constants.PPCLOUD_PUBLIC_REPORT_MD5_URL + info.getFid() + Constants.REPORT_MD5_END)
+				.addHeader(AUTHORIZATION, info.getToken()).addParams(FEATURE_PPLIVE, info.getPpfeature())
 				.addParams(MD5, fileMd5).build().execute(callback);
 	}
 
 	// 上传进度
 	public void getUploadProgress(StringCallback callback, UploadInfo info) {
-		OkHttpUtils
-				.get()
-				.url(Constants.PPCLOUD_PUBLIC_TEST_UPLOAD_PROGRESS_URL
-						+ info.getFid() + Constants.UPLOAD_PROGRESS_END)
-				.addHeader(AUTHORIZATION, info.getToken())
-				.addParams(FROMCP, "ppcloud").build().execute(callback);
+		OkHttpUtils.get()
+				.url(Constants.PPCLOUD_PUBLIC_UPLOAD_PROGRESS_URL + info.getFid() + Constants.UPLOAD_PROGRESS_END)
+				.addHeader(AUTHORIZATION, info.getToken()).addParams(FROMCP, "ppcloud").build().execute(callback);
 	}
 }
