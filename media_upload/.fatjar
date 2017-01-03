@@ -1,14 +1,14 @@
 #Fat Jar Configuration File
-#Fri Dec 30 10:25:31 CST 2016
+#Tue Jan 03 10:07:40 CST 2017
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
 onejar.checkbox=false
-jarname=media_upload_fat.jar
+jarname=media_upload_sdk.jar
 manifest.mergeall=true
 manifest.mainclass=
 manifest.file=<createnew>
 jarname.isextern=false
 onejar.expand=
-excludes=
+excludes=<jar|android-support-v4.jar>
 includes=
