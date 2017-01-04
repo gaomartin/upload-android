@@ -10,16 +10,25 @@ media_upload_test/gen
 media_upload_demo/bin
 media_upload_demo/gen
 
-media_upload_test/bin
-media_upload_test/gen
-media_upload_test/build
-media_upload_test/.gradle
-media_upload_test/app/build
-media_upload_test/app/app.iml
+media_upload_test_as/media_upload_test/bin
+media_upload_test_as/media_upload_test/gen
+media_upload_test_as/media_upload_test/build
+media_upload_test_as/media_upload_test/.gradle
+media_upload_test_as/media_upload_test/app/build
+media_upload_test_as/media_upload_test/app/app.iml
 
-media_upload/bin
-media_upload/gen
-media_upload/build
-media_upload/.gradle
-media_upload/app/build
+media_upload_test_as/media_upload_demo/bin
+media_upload_test_as/media_upload_demo/gen
+media_upload_test_as/media_upload_demo/build
+media_upload_test_as/media_upload_demo/.gradle
+media_upload_test_as/media_upload_demo/app/build
+media_upload_test_as/media_upload_demo/app/app.iml
+
+media_upload_test_as/build
+
+media_upload_test_as/media_upload/bin
+media_upload_test_as/media_upload/gen
+media_upload_test_as/media_upload/build
+media_upload_test_as/media_upload/.gradle
+media_upload_test_as/media_upload/app/build
 media_upload_test/app/app.iml
