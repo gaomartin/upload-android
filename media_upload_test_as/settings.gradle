@@ -1,0 +1,2 @@
+include ':media_upload'
+include ':media_upload_test'
