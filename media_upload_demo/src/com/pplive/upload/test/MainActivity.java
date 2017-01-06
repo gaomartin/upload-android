@@ -44,6 +44,7 @@ public class MainActivity extends Activity implements UpLoadManagerListener {
 	private ListView listView;
 	private UploadListAdapter adapter;
 	private String videoPath;
+	private String uptokenUrl = "http://115.231.44.26:8081/uploadtest/uptoken";
 	private Handler mHandler = new Handler() {
 
 		@Override
@@ -67,7 +68,7 @@ public class MainActivity extends Activity implements UpLoadManagerListener {
 		listView = (ListView) findViewById(R.id.listView);
 		adapter = new UploadListAdapter(mContext);
 		listView.setAdapter(adapter);
-		mUploadManager = UploadManager.init(mContext);
+		mUploadManager = UploadManager.init(mContext, uptokenUrl);
 		mUploadManager.setListener(this);
 		GetVideoPathTask getVideoPathTask = new GetVideoPathTask();
 		getVideoPathTask.execute();

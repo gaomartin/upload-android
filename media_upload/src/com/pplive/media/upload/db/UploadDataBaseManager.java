@@ -20,13 +20,11 @@ public class UploadDataBaseManager {
 	public static final String FIELD_LOCAL_PATH = "local_path";
 	public static final String FIELD_NAME = "name";
 	public static final String FIELD_TOKEN = "token";
-	public static final String FIELD_APITK = "apitk";
 	public static final String FIELD_SIZE = "size";
 	public static final String FIELD_STATE = "state";
 	public static final String FIELD_PPFEATURE = "ppfeature";
 	public static final String FIELD_FID = "fid";
 	public static final String FIELD_PROGRESS = "progress";
-	public static final String FIELD_USER_NAME = "user_name";
 	public static final String FIELD_CATEGORY_ID = "categoryId";
 	public static final String FIELD_CHANNEL_WEB_ID = "channel_web_id";
 
@@ -57,8 +55,6 @@ public class UploadDataBaseManager {
 			values.put(FIELD_PROGRESS, info.getProgress());
 			values.put(FIELD_SIZE, info.getSize());
 			values.put(FIELD_STATE, info.getState());
-			values.put(FIELD_USER_NAME, info.getUserName());
-			values.put(FIELD_APITK, info.getApitk());
 			values.put(FIELD_PPFEATURE, info.getPpfeature());
 			values.put(FIELD_TOKEN, info.getToken());
 			values.put(FIELD_NAME, info.getName());
@@ -82,9 +78,7 @@ public class UploadDataBaseManager {
 			values.put(FIELD_PROGRESS, info.getProgress());
 			values.put(FIELD_SIZE, info.getSize());
 			values.put(FIELD_STATE, info.getState());
-			values.put(FIELD_USER_NAME, info.getUserName());
 			values.put(FIELD_TOKEN, info.getToken());
-			values.put(FIELD_APITK, info.getApitk());
 			values.put(FIELD_CHANNEL_WEB_ID, info.getChannel_web_id());
 			values.put(FIELD_CATEGORY_ID, info.getCategoryId());
 			mDatabase.update(TABLE_UPLOAD, values, BaseColumns._ID + "=?",
@@ -105,12 +99,11 @@ public class UploadDataBaseManager {
 		}
 	}
 
-	public List<UploadInfo> searchAllUploads(String username) {
+	public List<UploadInfo> searchAllUploads() {
 		List<UploadInfo> result = new ArrayList<UploadInfo>();
 		Cursor c = null;
 		try {
-			c = mDatabase.rawQuery("SELECT * FROM " + TABLE_UPLOAD + " WHERE " + FIELD_USER_NAME + "=?",
-					new String[] { username });
+			c = mDatabase.rawQuery("SELECT * FROM " + TABLE_UPLOAD, null);
 			if (c != null) {
 				while (c.moveToNext()) {
 					UploadInfo info = new UploadInfo();
@@ -121,11 +114,9 @@ public class UploadDataBaseManager {
 					info.setPpfeature(c.getString(c.getColumnIndex(FIELD_PPFEATURE)));
 					info.setProgress(c.getInt(c.getColumnIndex(FIELD_PROGRESS)));
 					info.setSize((c.getString(c.getColumnIndex(FIELD_SIZE))));
-					info.setApitk((c.getString(c.getColumnIndex(FIELD_APITK))));
 					info.setToken((c.getString(c.getColumnIndex(FIELD_TOKEN))));
 					info.setState(c.getInt(c.getColumnIndex(FIELD_STATE)));
 					info.setChannel_web_id(c.getString(c.getColumnIndex(FIELD_CHANNEL_WEB_ID)));
-					info.setUserName(c.getString(c.getColumnIndex(FIELD_USER_NAME)));
 					info.setCategoryId(c.getInt(c.getColumnIndex(FIELD_CATEGORY_ID)));
 					result.add(info);
 				}
@@ -136,12 +127,11 @@ public class UploadDataBaseManager {
 		}
 	}
 
-	public List<String> searchVideoPaths(String username) {
+	public List<String> searchVideoPaths() {
 		List<String> pathList = new ArrayList<String>();
 		Cursor c = null;
 		try {
-			c = mDatabase.rawQuery("SELECT * FROM " + TABLE_UPLOAD + " WHERE " + FIELD_USER_NAME + "=?",
-					new String[] { username });
+			c = mDatabase.rawQuery("SELECT * FROM " + TABLE_UPLOAD, null);
 			if (c != null) {
 				while (c.moveToNext()) {
 
@@ -169,18 +159,15 @@ public class UploadDataBaseManager {
 							+ "%s TEXT, " // FIELD_LOCAL_PATH
 							+ "%s TEXT, " // FIELD_NAME
 							+ "%s TEXT, " // FIELD_TOKEN
-							+ "%s TEXT, " // FIELD_APITK
 							+ "%s TEXT, " // FIELD_SIZE
 							+ "%s INTEGER, " // FIELD_STATE
 							+ "%s TEXT, " // FIELD_PPFEATURE
 							+ "%s TEXT, " // FIELD_FID
 							+ "%s TEXT, "// FIELD_CATEGORY_ID
 							+ "%s TEXT, "// FIELD_CHANNEL_WEB_ID
-							+ "%s INTEGER, " // FIELD_PROGRESS
-							+ "%s TEXT)", // FIELD_USER_NAME
-					TABLE_UPLOAD, BaseColumns._ID, FIELD_LOCAL_PATH, FIELD_NAME, FIELD_TOKEN, FIELD_APITK, FIELD_SIZE,
-					FIELD_STATE, FIELD_PPFEATURE, FIELD_FID, FIELD_CATEGORY_ID, FIELD_CHANNEL_WEB_ID, FIELD_PROGRESS,
-					FIELD_USER_NAME));
+							+ "%s INTEGER)", // FIELD_PROGRESS
+					TABLE_UPLOAD, BaseColumns._ID, FIELD_LOCAL_PATH, FIELD_NAME, FIELD_TOKEN, FIELD_SIZE, FIELD_STATE,
+					FIELD_PPFEATURE, FIELD_FID, FIELD_CATEGORY_ID, FIELD_CHANNEL_WEB_ID, FIELD_PROGRESS));
 		}
 
 		@Override

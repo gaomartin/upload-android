@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
-import okhttp3.Call;
-
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -30,6 +28,8 @@ import com.pplive.media.upload.util.StringUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import okhttp3.Call;
+
 public class UploadAPI {
 	public static final String TAG = UploadAPI.class.getName();
 	public static final int EXCEPTION_CODE = -1;
@@ -43,8 +43,6 @@ public class UploadAPI {
 	private static final String RANGE_MD5 = "range_md5";
 	private static final String UPLOADID = "uploadid";
 	private static final String MD5 = "md5";
-	private static final String APITK = "apitk";
-	private static final String CATEGORYID = "categoryid";
 	private static final String FROMCP = "fromcp";
 
 	private UploadAPI() {
@@ -77,7 +75,7 @@ public class UploadAPI {
 
 	// 获取FID
 	public void getFid(StringCallback callback, UploadInfo info) {
-		OkHttpUtils.get().url("http://115.231.44.26:8081/uploadtest/uptoken").addParams("name", info.getName())
+		OkHttpUtils.get().url(Constants.PPCLOUC_PUBLIC_UPTOKEN).addParams("name", info.getName())
 				.addParams("length", info.getSize()).addParams(PPFEATURE, info.getPpfeature()).build()
 				.execute(callback);
 	}

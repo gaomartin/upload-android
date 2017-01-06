@@ -16,24 +16,19 @@ public class UploadInfo {
 	public static final int STATE_UPLOAD_SUCCESS = 4;// 上传成功
 	public static final int STATE_HAS_UPLOAD = 5;// 已上传
 
-	private int finishSize;
-	private int status;
-	private String ppfeature;
-	private String fid;
-	private long pid;
-	private String userName;
-	private int categoryId;
-	private int state;
-	private String size;
-	private String name;
-	private String localPath;
-	private long id;
-	private int progress;
-	private String token;
-	private String apitk;
+	private int status;//
+	private String ppfeature;// 视频特征
+	private String fid;// 文件id
+	private int categoryId;// 分类id
+	private int state;// 上传状态值
+	private String size;//文件长度
+	private String name;// 上传文件名
+	private String localPath;// 上传文件的本地地址
+	private long id;//数据主键id
+	private int progress;// 上传进度
+	private String token;// 上传文件token
 	private boolean isPause;
-	private String channel_web_id;
-	private int length;
+	private String channel_web_id;//网路频道id
 
 	public int getCategoryId() {
 		return categoryId;
@@ -41,14 +36,6 @@ public class UploadInfo {
 
 	public void setCategoryId(int categoryId) {
 		this.categoryId = categoryId;
-	}
-
-	public int getLength() {
-		return length;
-	}
-
-	public void setLength(int length) {
-		this.length = length;
 	}
 
 	public String getChannel_web_id() {
@@ -65,14 +52,6 @@ public class UploadInfo {
 
 	public void setPause(boolean isPause) {
 		this.isPause = isPause;
-	}
-
-	public String getApitk() {
-		return apitk;
-	}
-
-	public void setApitk(String apitk) {
-		this.apitk = apitk;
 	}
 
 	public String getToken() {
@@ -99,14 +78,6 @@ public class UploadInfo {
 		return id;
 	}
 
-	public int getFinishSize() {
-		return finishSize;
-	}
-
-	public void setFinishSize(int finishSize) {
-		this.finishSize = finishSize;
-	}
-
 	public int getStatus() {
 		return status;
 	}
@@ -129,22 +100,6 @@ public class UploadInfo {
 
 	public void setFid(String fid) {
 		this.fid = fid;
-	}
-
-	public long getPid() {
-		return pid;
-	}
-
-	public void setPid(long pid) {
-		this.pid = pid;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
 	}
 
 	public int getState() {
@@ -181,10 +136,9 @@ public class UploadInfo {
 
 	@Override
 	public String toString() {
-		return "UploadInfo [finishSize=" + finishSize + ", status=" + status + ", ppfeature=" + ppfeature + ", fid="
-				+ fid + ", pid=" + pid + ", userName=" + userName + ", categoryId=" + categoryId + ", state=" + state
-				+ ", size=" + size + ", name=" + name + ", localPath=" + localPath + ", id=" + id + ", progress="
-				+ progress + ", token=" + token + ", apitk=" + apitk + "]";
+		return "UploadInfo [status=" + status + ", ppfeature=" + ppfeature + ", fid=" + fid + ", categoryId="
+				+ categoryId + ", state=" + state + ", size=" + size + ", name=" + name + ", localPath=" + localPath
+				+ ", id=" + id + ", progress=" + progress + ", token=" + token + "]";
 	}
 
 }

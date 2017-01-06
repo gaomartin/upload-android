@@ -36,21 +36,6 @@ public class UploadHelper {
 		return sInstance;
 	}
 
-	// public void init(String videoPath, UploadInfo info) {
-	// setSize(DirectoryManager.getVideoFileSize(videoPath) + "");
-	// setPpfeature(calculatePpfeature(videoPath));
-	// setVideopath(videoPath);
-	// String apitk = UploadHelper.getInstance().getApitk(Constants.PPYUN_KEY,
-	// Constants.PPCLOUD_TEST_URL);
-	// setApitk(apitk);
-	// }
-
-	public String getApitk(String key, String url) {
-		StringBuffer sbf = new StringBuffer(key);
-		sbf.append(url);
-		return MD5Util.getStringMD5(sbf.toString());
-	}
-
 	public String calculatePpfeature(String path) {
 		String ppFeature = "";
 		try {

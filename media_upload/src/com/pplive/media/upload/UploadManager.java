@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import okhttp3.Call;
-import android.content.Context;
-
 import com.pplive.media.upload.bean.FidRespBean;
 import com.pplive.media.upload.bean.RespBean;
 import com.pplive.media.upload.bean.UploadInfo;
@@ -29,13 +26,14 @@ import com.pplive.media.upload.util.LogUtils;
 import com.pplive.media.upload.util.MD5Util;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import android.content.Context;
+import okhttp3.Call;
+
 public class UploadManager {
 	private static Context mContext;
-	public static String PPYUN_USERNAME = Constants.PPYUN_USERNAME;
 	private static final UploadManager sInstance = new UploadManager();
 	private static UploadDataBaseManager mUploadManager;
 	private String mVideopath;
-	private String apitk;
 	private String ppfeature;
 	private String size;
 	private static ExecutorService ex;
@@ -59,14 +57,6 @@ public class UploadManager {
 		this.ppfeature = ppfeature;
 	}
 
-	public String getApitk() {
-		return apitk;
-	}
-
-	public void setApitk(String apitk) {
-		this.apitk = apitk;
-	}
-
 	public String getVideopath() {
 		return mVideopath;
 	}
@@ -75,11 +65,12 @@ public class UploadManager {
 		this.mVideopath = videopath;
 	}
 
-	public static UploadManager init(Context context) {
+	public static UploadManager init(Context context, String url) {
 		mContext = context;
 		ex = Executors.newCachedThreadPool();
 		mUploadManager = UploadDataBaseManager.getInstance(mContext);
 		initLog(context);
+		Constants.PPCLOUC_PUBLIC_UPTOKEN = url;
 		return sInstance;
 	}
 
@@ -111,7 +102,6 @@ public class UploadManager {
 		info.setPpfeature(calculatePpfeature(videoPath));
 		info.setLocalPath(videoPath);
 		info.setState(UploadInfo.STATE_WAIT);
-		info.setUserName(Constants.PPYUN_USERNAME);
 		info.setName(name);
 		getFid(info);
 	}
@@ -155,9 +145,9 @@ public class UploadManager {
 						info.setToken(token);
 						info.setFid(fid + "");
 						info.setChannel_web_id(fidRespBean.getData().getChannel_web_id());
-//						info.setLength(fidRespBean.getData().getLength());
+						// info.setLength(fidRespBean.getData().getLength());
 						info.setCategoryId(fidRespBean.getData().getCategory_id());
-							
+
 						LogUtils.error("insertUpload info = " + info.toString());
 						mUploadManager.insertUpload(info);
 
@@ -236,12 +226,6 @@ public class UploadManager {
 				}
 			}
 		}, info);
-	}
-
-	public String getApitk(String key, String url) {
-		StringBuffer sbf = new StringBuffer(key);
-		sbf.append(url);
-		return MD5Util.getStringMD5(sbf.toString());
 	}
 
 	public String calculatePpfeature(String path) {
@@ -333,10 +317,10 @@ public class UploadManager {
 	}
 
 	public List<UploadInfo> searchAllUploads() {
-		return mUploadManager.searchAllUploads(PPYUN_USERNAME);
+		return mUploadManager.searchAllUploads();
 	}
 
 	public List<String> searchVideoPaths() {
-		return mUploadManager.searchVideoPaths(PPYUN_USERNAME);
+		return mUploadManager.searchVideoPaths();
 	}
 }
