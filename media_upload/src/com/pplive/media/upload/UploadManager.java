@@ -96,6 +96,10 @@ public class UploadManager {
 	}
 
 	public void insertVideo(String videoPath, String name) {
+		insertVideo(videoPath, name, "");
+	}
+	
+	public void insertVideo(String videoPath, String name, String cookie) {
 		mVideopath = videoPath;
 		UploadInfo info = new UploadInfo();
 		info.setSize(DirectoryManager.getVideoFileSize(videoPath) + "");
@@ -103,7 +107,7 @@ public class UploadManager {
 		info.setLocalPath(videoPath);
 		info.setState(UploadInfo.STATE_WAIT);
 		info.setName(name);
-		getFid(info);
+		getFid(info, cookie);
 	}
 
 	private UpLoadManagerListener listener;
@@ -121,7 +125,7 @@ public class UploadManager {
 		listener.onStateChange(info);
 	}
 
-	public void getFid(final UploadInfo info) {
+	public void getFid(final UploadInfo info, String cookie) {
 		UploadAPI.getInstance().getFid(new StringCallback() {
 			@Override
 			public void onError(Call arg0, Exception arg1, int arg2) {
@@ -181,7 +185,7 @@ public class UploadManager {
 					listener.onAddUploadTask(false);
 				}
 			}
-		}, info);
+		}, info, cookie);
 	}
 
 	public void updataUploadThread(UploadInfo info) {

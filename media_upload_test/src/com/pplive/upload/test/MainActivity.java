@@ -45,6 +45,7 @@ public class MainActivity extends Activity implements UpLoadManagerListener {
 	private UploadListAdapter adapter;
 	private String videoPath;
 	private String uptokenUrl = "http://115.231.44.26:8081/uploadtest/uptoken";
+	private String cookie = "";
 	private Handler mHandler = new Handler() {
 
 		@Override
@@ -118,7 +119,7 @@ public class MainActivity extends Activity implements UpLoadManagerListener {
 							Toast.makeText(mContext, "已添加过", 0).show();
 						} else {
 							LogUtils.error("未添加过 videoPath =" + videoPath.toString());
-							mUploadManager.insertVideo(videoPath, name);
+							mUploadManager.insertVideo(videoPath, name, cookie);
 						}
 					} else {
 						Toast.makeText(mContext, "文件小于1M,无法上传", 0).show();
@@ -135,7 +136,7 @@ public class MainActivity extends Activity implements UpLoadManagerListener {
 						if (videoPaths.contains(videoPath)) {
 							Toast.makeText(mContext, "已添加过", 0).show();
 						} else {
-							mUploadManager.insertVideo(videoPath, name);
+							mUploadManager.insertVideo(videoPath, name, cookie);
 						}
 					} else {
 						Toast.makeText(mContext, "文件小于1M,无法上传", 0).show();

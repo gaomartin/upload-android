@@ -28,6 +28,7 @@ import com.pplive.media.upload.util.StringUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import android.text.TextUtils;
 import okhttp3.Call;
 
 public class UploadAPI {
@@ -44,6 +45,10 @@ public class UploadAPI {
 	private static final String UPLOADID = "uploadid";
 	private static final String MD5 = "md5";
 	private static final String FROMCP = "fromcp";
+	private static final String COOKIE = "Cookie";
+	private static final String NAME = "name";
+	private static final String LENGTH = "length";
+	private static final String BID = "bid";
 
 	private UploadAPI() {
 	}
@@ -74,27 +79,34 @@ public class UploadAPI {
 	}
 
 	// 获取FID
-	public void getFid(StringCallback callback, UploadInfo info) {
-		OkHttpUtils.get().url(Constants.PPCLOUC_PUBLIC_UPTOKEN).addParams("name", info.getName())
-				.addParams("length", info.getSize()).addParams(PPFEATURE, info.getPpfeature()).build()
-				.execute(callback);
+	public void getFid(StringCallback callback, UploadInfo info, String cookie) {
+		if (!TextUtils.isEmpty(cookie)) {
+			OkHttpUtils.get().url(Constants.PPCLOUC_PUBLIC_UPTOKEN).addHeader(COOKIE, cookie)
+					.addParams(NAME, info.getName()).addParams(LENGTH, info.getSize())
+					.addParams(PPFEATURE, info.getPpfeature()).build().execute(callback);
+		} else {
+			OkHttpUtils.get().url(Constants.PPCLOUC_PUBLIC_UPTOKEN).addParams(NAME, info.getName())
+					.addParams(LENGTH, info.getSize()).addParams(PPFEATURE, info.getPpfeature()).build()
+					.execute(callback);
+		}
 	}
 
 	// 上传范围
 	public void getUploadRange(StringCallback callback, UploadInfo info) {
 		OkHttpUtils.get().url(Constants.PPCLOUD_PUBLIC_UPLOADRANGE_URL + info.getFid() + Constants.UPLOADRANGE_END)
 				.addHeader(AUTHORIZATION, info.getToken()).addParams(FEATURE_PPLIVE, info.getPpfeature())
-				.addParams(SEGS, "1").addParams("fromcp", "ppcloud").addParams(INNER, "false").build()
-				.execute(callback);
+				.addParams(SEGS, "1").addParams(FROMCP, "ppcloud").addParams(INNER, "false").build().execute(callback);
 	}
 
 	// 上传分段文件
+	@SuppressWarnings("deprecation")
 	public int uploadFile(List<RangesBean> ranges, final UploadInfo info) throws IOException {
 		LogUtils.error("上传分段文件 : ==uploadFile(ranges)== fid:" + info.getFid());
 		File file = new File(info.getLocalPath());
 		BasicHttpParams httpParameters = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpParameters, 1000 * 20);
 		HttpConnectionParams.setSoTimeout(httpParameters, 1000 * 20);
+		@SuppressWarnings("resource")
 		HttpClient httpClient = new DefaultHttpClient(httpParameters);
 
 		int code = EXCEPTION_CODE;
@@ -183,7 +195,7 @@ public class UploadAPI {
 	private void uploadReport(String rangeMD5, String bid, String uploadid, StringCallback callback, UploadInfo info) {
 		OkHttpUtils.post()
 				.url(Constants.PPCLOUD_PUBLIC_UPLOADRANGE_REPORT_URL + info.getFid() + Constants.UPLOADRANGE_REPORT_END)
-				.addHeader(AUTHORIZATION, info.getToken()).addParams(RANGE_MD5, rangeMD5).addParams("bid", bid)
+				.addHeader(AUTHORIZATION, info.getToken()).addParams(RANGE_MD5, rangeMD5).addParams(BID, bid)
 				.addParams(UPLOADID, uploadid).build().execute(callback);
 	}
 
